@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <algorithm>
+#include <iomanip>
 
 PmergeMe::PmergeMe(void) {}
 
@@ -146,27 +147,38 @@ void PmergeMe::fordJohnsonDeque(std::deque<int>& arr)
 
 void PmergeMe::sort(void)
 {
-	timeval start, end;
-	
-	gettimeofday(&start, NULL);
-	fordJohnsonVector(_vector);
-	gettimeofday(&end, NULL);
-	double timeVector =(end.tv_usec - start.tv_usec);
-	
-	gettimeofday(&start, NULL);
-	fordJohnsonDeque(_deque);
-	gettimeofday(&end, NULL);
-	double timeDeque = (end.tv_sec - start.tv_sec) * 1000000.0 + (end.tv_usec - start.tv_usec);
+    std::cout << "Before: ";
+    for (size_t i = 0; i < _vector.size(); ++i)
+    {
+        if (i > 0) std::cout << " ";
+        std::cout << _vector[i];
+    }
+    std::cout << std::endl;
+    timeval start, end;
+    gettimeofday(&start, NULL);
+    fordJohnsonVector(_vector);
+    gettimeofday(&end, NULL);
+    double timeVector = (end.tv_sec - start.tv_sec)*1000000.0 + (end.tv_usec - start.tv_usec);
 
-	std::cout << "After: ";
-	for (size_t i = 0; i < _vector.size(); i++)
-	{
-		if (i > 0) std::cout << " ";
-		std::cout << _vector[i];
-	}
-	std::cout << std::endl;
-	
-	std::cout << "Time to process a range of " << _vector.size() << " elements with std::vector : " << timeVector << " us" << std::endl;
-	std::cout << "Time to process a range of " << _deque.size() << " elements with std::deque : " << timeDeque << " us" << std::endl;
+    gettimeofday(&start, NULL);
+    fordJohnsonDeque(_deque);
+    gettimeofday(&end, NULL);
+    double timeDeque = (end.tv_sec - start.tv_sec)*1000000.0 + (end.tv_usec - start.tv_usec);
+
+    std::cout << "After: ";
+    for (size_t i = 0; i < _vector.size(); ++i)
+    {
+        if (i > 0) std::cout << " ";
+        std::cout << _vector[i];
+    }
+    std::cout << std::endl;
+
+
+    std::cout << std::fixed << std::setprecision(6);
+    std::cout << "Time to process a range of " << _vector.size()
+              << " elements with std::vector: " << timeVector << " us" << std::endl;
+    std::cout << "Time to process a range of " << _deque.size()
+              << " elements with std::deque: " << timeDeque << " us" << std::endl;
 }
+
 

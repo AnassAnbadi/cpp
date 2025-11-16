@@ -13,17 +13,8 @@ int main(int argc, char** argv)
 	if (!sorter.parseInput(argc, argv))
 		return 1;
 	
-	std::cout << "Before: ";
-	for (int i = 1; i < argc; i++)
-	{
-		if (i > 1) std::cout << " ";
-		std::cout << argv[i];
-	}
-	std::cout << std::endl;
-	
 	sorter.sort();
 	
-	// sorter.display();
 	
 	return 0;
 }
