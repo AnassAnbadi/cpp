@@ -1,7 +1,8 @@
 #include "PmergeMe.hpp"
+#include <sys/time.h>
 #include <iostream>
 #include <cstdlib>
-#include <cstring>
+#include <algorithm>
 
 PmergeMe::PmergeMe(void) {}
 
@@ -41,12 +42,21 @@ bool PmergeMe::parseInput(int argc, char** argv)
 	return true;
 }
 
-void PmergeMe::mergeInsertVector(std::vector<int>& arr)
+int PmergeMe::jacobsthal(int n)
+{
+	if (n == 0)
+		return 0;
+	if (n == 1)
+		return 1;
+	return jacobsthal(n - 1) + 2 * jacobsthal(n - 2);
+}
+
+void PmergeMe::fordJohnsonVector(std::vector<int>& arr)
 {
 	if (arr.size() <= 1)
 		return;
-	
 	std::vector<std::pair<int, int> > pairs;
+	int unpaired = -1;
 	
 	for (size_t i = 0; i + 1 < arr.size(); i += 2)
 	{
@@ -56,40 +66,43 @@ void PmergeMe::mergeInsertVector(std::vector<int>& arr)
 			pairs.push_back(std::make_pair(arr[i], arr[i + 1]));
 	}
 	
-	int unpaired = (arr.size() % 2 == 1) ? arr[arr.size() - 1] : -1;
-	
+	if (arr.size() % 2 == 1)
+		unpaired = arr[arr.size() - 1];
 	std::vector<int> smaller;
 	for (size_t i = 0; i < pairs.size(); i++)
 		smaller.push_back(pairs[i].first);
 	
-	mergeInsertVector(smaller);
+	fordJohnsonVector(smaller);
 	
-	std::vector<int> sorted;
+	std::vector<int> result;
 	for (size_t i = 0; i < smaller.size(); i++)
-		sorted.push_back(smaller[i]);
-	
+		result.push_back(smaller[i]);
+	std::vector<int> largerElements;
 	for (size_t i = 0; i < pairs.size(); i++)
+		largerElements.push_back(pairs[i].second);
+	
+	for (size_t i = 0; i < largerElements.size(); i++)
 	{
-		int larger = pairs[i].second;
-		std::vector<int>::iterator pos = std::lower_bound(sorted.begin(), sorted.end(), larger);
-		sorted.insert(pos, larger);
+		std::vector<int>::iterator pos = std::lower_bound(result.begin(), result.end(), largerElements[i]);
+		result.insert(pos, largerElements[i]);
 	}
 	
 	if (unpaired != -1)
 	{
-		std::vector<int>::iterator pos = std::lower_bound(sorted.begin(), sorted.end(), unpaired);
-		sorted.insert(pos, unpaired);
+		std::vector<int>::iterator pos = std::lower_bound(result.begin(), result.end(), unpaired);
+		result.insert(pos, unpaired);
 	}
 	
-	arr = sorted;
+	arr = result;
 }
 
-void PmergeMe::mergeInsertDeque(std::deque<int>& arr)
+void PmergeMe::fordJohnsonDeque(std::deque<int>& arr)
 {
 	if (arr.size() <= 1)
 		return;
 	
 	std::deque<std::pair<int, int> > pairs;
+	int unpaired = -1;
 	
 	for (size_t i = 0; i + 1 < arr.size(); i += 2)
 	{
@@ -99,32 +112,36 @@ void PmergeMe::mergeInsertDeque(std::deque<int>& arr)
 			pairs.push_back(std::make_pair(arr[i], arr[i + 1]));
 	}
 	
-	int unpaired = (arr.size() % 2 == 1) ? arr[arr.size() - 1] : -1;
+	if (arr.size() % 2 == 1)
+		unpaired = arr[arr.size() - 1];
 	
 	std::deque<int> smaller;
 	for (size_t i = 0; i < pairs.size(); i++)
 		smaller.push_back(pairs[i].first);
 	
-	mergeInsertDeque(smaller);
+	fordJohnsonDeque(smaller);
 	
-	std::deque<int> sorted;
+	std::deque<int> result;
 	for (size_t i = 0; i < smaller.size(); i++)
-		sorted.push_back(smaller[i]);
+		result.push_back(smaller[i]);
 	
+	std::deque<int> largerElements;
 	for (size_t i = 0; i < pairs.size(); i++)
+		largerElements.push_back(pairs[i].second);
+	
+	for (size_t i = 0; i < largerElements.size(); i++)
 	{
-		int larger = pairs[i].second;
-		std::deque<int>::iterator pos = std::lower_bound(sorted.begin(), sorted.end(), larger);
-		sorted.insert(pos, larger);
+		std::deque<int>::iterator pos = std::lower_bound(result.begin(), result.end(), largerElements[i]);
+		result.insert(pos, largerElements[i]);
 	}
 	
 	if (unpaired != -1)
 	{
-		std::deque<int>::iterator pos = std::lower_bound(sorted.begin(), sorted.end(), unpaired);
-		sorted.insert(pos, unpaired);
+		std::deque<int>::iterator pos = std::lower_bound(result.begin(), result.end(), unpaired);
+		result.insert(pos, unpaired);
 	}
 	
-	arr = sorted;
+	arr = result;
 }
 
 void PmergeMe::sort(void)
@@ -132,31 +149,15 @@ void PmergeMe::sort(void)
 	timeval start, end;
 	
 	gettimeofday(&start, NULL);
-	mergeInsertVector(_vector);
+	fordJohnsonVector(_vector);
 	gettimeofday(&end, NULL);
-	
-	double timeVector = (end.tv_sec - start.tv_sec) * 1000000.0 + (end.tv_usec - start.tv_usec);
+	double timeVector =(end.tv_usec - start.tv_usec);
 	
 	gettimeofday(&start, NULL);
-	mergeInsertDeque(_deque);
+	fordJohnsonDeque(_deque);
 	gettimeofday(&end, NULL);
-	
 	double timeDeque = (end.tv_sec - start.tv_sec) * 1000000.0 + (end.tv_usec - start.tv_usec);
-	
-	std::cout << "Time to process a range of " << _vector.size() << " elements with std::vector : " << timeVector << " us" << std::endl;
-	std::cout << "Time to process a range of " << _deque.size() << " elements with std::deque : " << timeDeque << " us" << std::endl;
-}
 
-void PmergeMe::display(void)
-{
-	std::cout << "Before: ";
-	for (size_t i = 0; i < _vector.size(); i++)
-	{
-		if (i > 0) std::cout << " ";
-		std::cout << _vector[i];
-	}
-	std::cout << std::endl;
-	
 	std::cout << "After: ";
 	for (size_t i = 0; i < _vector.size(); i++)
 	{
@@ -164,4 +165,8 @@ void PmergeMe::display(void)
 		std::cout << _vector[i];
 	}
 	std::cout << std::endl;
+	
+	std::cout << "Time to process a range of " << _vector.size() << " elements with std::vector : " << timeVector << " us" << std::endl;
+	std::cout << "Time to process a range of " << _deque.size() << " elements with std::deque : " << timeDeque << " us" << std::endl;
 }
+

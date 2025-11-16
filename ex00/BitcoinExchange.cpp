@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <cstdlib>
-#include <cmath>
+#include <iostream>
 
 BitcoinExchange::BitcoinExchange(void) {}
 
@@ -52,15 +52,12 @@ bool BitcoinExchange::loadDatabase(const std::string& filename)
 float BitcoinExchange::getRate(const std::string& date) const
 {
 	std::map<std::string, float>::const_iterator it = _exchangeRates.find(date);
-	
 	if (it != _exchangeRates.end())
 		return it->second;
 	
 	it = _exchangeRates.lower_bound(date);
-	
 	if (it == _exchangeRates.begin())
 		return -1;
-	
 	--it;
 	return it->second;
 }
@@ -78,7 +75,6 @@ bool isValidDate(const std::string& date)
 	
 	if (year < 2009 || month < 1 || month > 12 || day < 1 || day > 31)
 		return false;
-	
 	return true;
 }
 
@@ -121,7 +117,6 @@ void BitcoinExchange::processInput(const std::string& filename)
 		
 		char* endptr;
 		float value = std::strtof(valueStr.c_str(), &endptr);
-		
 		if (*endptr != '\0')
 		{
 			std::cout << "Error: bad input => " << line << std::endl;

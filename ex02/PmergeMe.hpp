@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <deque>
-#include <sys/time.h>
+#include <utility>
 
 class PmergeMe
 {
@@ -14,16 +14,18 @@ private:
 	PmergeMe(const PmergeMe& other);
 	PmergeMe& operator=(const PmergeMe& rhs);
 	
-	void mergeInsertVector(std::vector<int>& arr);
-	void mergeInsertDeque(std::deque<int>& arr);
-
+	void fordJohnsonVector(std::vector<int>& arr);
+	void fordJohnsonDeque(std::deque<int>& arr);
+	
+	// Helper for generating Jacobsthal numbers
+	int jacobsthal(int n);
+	
 public:
 	PmergeMe(void);
 	~PmergeMe(void);
 	
 	bool parseInput(int argc, char** argv);
 	void sort(void);
-	void display(void);
 };
 
 #endif

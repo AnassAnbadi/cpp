@@ -1,5 +1,6 @@
 #include "RPN.hpp"
 #include <sstream>
+#include <iostream>
 #include <cstdlib>
 
 RPN::RPN(void) {}
@@ -54,13 +55,8 @@ bool RPN::evaluate(const std::string& expression)
 			}
 			_stack.push(result);
 		}
-		else if (token.find_first_not_of("0123456789") == std::string::npos)
+		else if (token.length() == 1 && token[0] >= '0' && token[0] <= '9')
 		{
-			if (token.length() > 1)
-			{
-				std::cerr << "Error" << std::endl;
-				return false;
-			}
 			_stack.push(std::atoi(token.c_str()));
 		}
 		else

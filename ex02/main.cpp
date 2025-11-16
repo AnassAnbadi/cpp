@@ -10,7 +10,6 @@ int main(int argc, char** argv)
 	}
 	
 	PmergeMe sorter;
-	
 	if (!sorter.parseInput(argc, argv))
 		return 1;
 	
@@ -23,7 +22,8 @@ int main(int argc, char** argv)
 	std::cout << std::endl;
 	
 	sorter.sort();
-	sorter.display();
+	
+	// sorter.display();
 	
 	return 0;
 }
